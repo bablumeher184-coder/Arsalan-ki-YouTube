@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Arslan Ki YouTube</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#080808;
+  color:#fff;
+}
+header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:#111;
+  padding:14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border-bottom:1px solid #333;
+}
+.logo{
+  color:#ff3030;
+  font-size:20px;
+  font-weight:bold;
+  flex:1;
+}
+button{
+  border:0;
+  border-radius:10px;
+  padding:12px 18px;
+  font-size:16px;
+  cursor:pointer;
+}
+.adminBtn{
+  background:#ff3030;
+  color:#fff;
+}
+.container{
+  max-width:1000px;
+  margin:auto;
+  padding:20px;
+}
+.tabs{
+  display:flex;
+  gap:10px;
+  overflow:auto;
+  margin-bottom:20px;
+}
+.tab{
+  background:#181818;
+  color:#fff;
+  min-width:90px;
+}
+.tab.active{
+  background:#fff;
+  color:#000;
+}
+.hero{
+  background:#171717;
+  padding:25px;
+  border-radius:18px;
+  margin-bottom:20px;
+}
+.status{
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:15px;
+  background:#222;
+}
+.success{color:#50e878}
+.error{color:#ff5555}
+.form{
+  background:#171717;
+  padding:20px;
+  border-radius:18px;
+}
+input,select,textarea{
+  width:100%;
+  padding:15px;
+  margin:7px 0 15px;
+  background:#090909;
+  border:1px solid #444;
+  border-radius:10px;
+  color:#fff;
+  font-size:16px;
+}
+label{
+  display:block;
+  margin-top:8px;
+  font-weight:bold;
+}
+.addBtn{
+  width:100%;
+  background:#ff3030;
+  color:white;
+  font-weight:bold;
+}
+.video{
+  background:#171717;
+  border-radius:15px;
+  overflow:hidden;
+  margin:20px 0;
+}
+.thumb{
+  width:100%;
+  aspect-ratio:16/9;
+  object-fit:cover;
+  background:#222;
+}
+.videoInfo{
+  padding:15px;
+}
+.videoTitle{
+  font-size:20px;
+  font-weight:bold;
+}
+.small{
+  color:#aaa;
+  margin-top:8px;
+}
+iframe,video{
+  width:100%;
+  aspect-ratio:16/9;
+  border:0;
+  display:block;
+}
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.8);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:100;
+  padding:20px;
+}
+.box{
+  width:100%;
+  max-width:500px;
+  background:#1c1c1c;
+  padding:25px;
+  border-radius:18px;
+}
+.close{
+  background:#444;
+  color:#fff;
+  width:100%;
+  margin-top:10px;
+}
+.login{
+  background:#ff3030;
+  color:white;
+  width:100%;
+}
+.hidden{display:none!important}
+.progress{
+  width:100%;
+  height:10px;
+  background:#333;
+  border-radius:10px;
+  overflow:hidden;
+  display:none;
+}
+.progressBar{
+  width:0%;
+  height:100%;
+  background:#ff3030;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">▶ Arslan Ki YouTube</div>
+  <button class="adminBtn" onclick="openLogin()">Admin</button>
+</header>
+
+<div class="container">
+
+  <div class="tabs">
+    <button class="tab active" onclick="showCategory('All',this)">Home</button>
+    <button class="tab" onclick="showCategory('Series',this)">Series</button>
+    <button class="tab" onclick="showCategory('Movies',this)">Movies</button>
+    <button class="tab" onclick="showCategory('Shorts',this)">Shorts</button>
+  </div>
+
+  <div class="hero">
+    <h1>Welcome to Arslan Ki YouTube</h1>
+    <p>Public videos, series, movies and shorts.</p>
+  </div>
+
+  <div id="status" class="status">
+    Connecting to Firebase...
+  </div>
+
+  <div id="adminPanel" class="form hidden">
+
+    <h2>👑 Admin Panel</h2>
+
+    <div id="adminStatus" class="status">
+      Admin login required.
+    </div>
+
+    <h2>➕ Add New Video</h2>
+
+    <label>Video Title</label>
+    <input id="title" type="text"
+      placeholder="Example: My New Video">
+
+    <label>Category</label>
+    <select id="category">
+      <option value="Series">Series</option>
+      <option value="Movies">Movies</option>
+      <option value="Shorts">Shorts</option>
+    </select>
+
+    <label>Thumbnail URL</label>
+    <input id="thumbnail" type="url"
+      placeholder="https://example.com/image.jpg">
+
+    <label>Video URL</label>
+    <input id="videoUrl" type="url"
+      placeholder="YouTube link या direct MP4 link">
+
+    <p style="color:#aaa">
+      अभी direct video upload नहीं किया है। YouTube या public MP4 URL डालें।
+    </p>
+
+    <button id="addBtn" class="addBtn" onclick="addVideo()">
+      ➕ ADD VIDEO
+    </button>
+
+    <div id="progress" class="progress">
+      <div id="progressBar" class="progressBar"></div>
+    </div>
+
+    <button class="close" onclick="logoutAdmin()">Logout</button>
+
+    <h2>📺 Added Videos</h2>
+    <div id="adminVideos"></div>
+
+  </div>
+
+  <h2>🎬 Videos</h2>
+  <div id="videos">
+    Loading videos...
+  </div>
+
+</div>
+
+<!-- LOGIN MODAL -->
+<div id="loginModal" class="modal">
+  <div class="box">
+
+    <h2>👑 Admin Login</h2>
+
+    <input id="email"
+      type="email"
+      placeholder="Admin Email">
+
+    <input id="password"
+      type="password"
+      placeholder="Password">
+
+    <button class="login" onclick="loginAdmin()">
+      Login
+    </button>
+
+    <button class="close" onclick="closeLogin()">
+      Close
+    </button>
+
+    <div id="loginMessage" style="margin-top:15px"></div>
+
+  </div>
+</div>
+
+
+<script type="module">
+
+/* =====================================================
+   FIREBASE
+===================================================== */
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  orderBy,
+  serverTimestamp,
+  deleteDoc,
+  doc
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCNfGSL9JmvrcydSniyIdz7ULiIsNYbbTo",
+  authDomain: "kranti-1e28f.firebaseapp.com",
+  projectId: "kranti-1e28f",
+  storageBucket: "kranti-1e28f.firebasestorage.app",
+  messagingSenderId: "407524375045",
+  appId: "1:407524375045:web:d74b6335be39bc935d7a6c",
+  measurementId: "G-HP3QFTLLBT"
+};
+
+
+/* START FIREBASE */
+
+let app;
+let auth;
+let db;
+
+try {
+
+  app = initializeApp(firebaseConfig);
+
+  auth = getAuth(app);
+
+  db = getFirestore(app);
+
+  document.getElementById("status").innerHTML =
+    "✅ Firebase Connected";
+
+  document.getElementById("status").className =
+    "status success";
+
+  loadVideos();
+
+} catch(error) {
+
+  console.error(error);
+
+  document.getElementById("status").innerHTML =
+    "❌ Firebase connection failed: " + error.message;
+
+  document.getElementById("status").className =
+    "status error";
+}
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+window.openLogin = function(){
+
+  document.getElementById("loginModal").style.display="flex";
+
+};
+
+window.closeLogin = function(){
+
+  document.getElementById("loginModal").style.display="none";
+
+};
+
+
+window.loginAdmin = async function(){
+
+  const email =
+    document.getElementById("email").value.trim();
+
+  const password =
+    document.getElementById("password").value;
+
+  const msg =
+    document.getElementById("loginMessage");
+
+
+  if(!email || !password){
+
+    msg.innerHTML =
+      "❌ Email और password दोनों डालें।";
+
+    return;
+  }
+
+
+  msg.innerHTML = "⏳ Login हो रहा है...";
+
+
+  try{
+
+    await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    msg.innerHTML =
+      "✅ Login successful";
+
+    setTimeout(()=>{
+      closeLogin();
+    },500);
+
+  }catch(error){
+
+    console.error(error);
+
+    msg.innerHTML =
+      "❌ Login failed: " + error.message;
+
+  }
+
+};
+
+
+/* =====================================================
+   AUTH STATE
+===================================================== */
+
+onAuthStateChanged(auth, user => {
+
+  const panel =
+    document.getElementById("adminPanel");
+
+  const adminStatus =
+    document.getElementById("adminStatus");
+
+
+  if(user){
+
+    panel.classList.remove("hidden");
+
+    adminStatus.innerHTML =
+      "✅ Admin logged in: " + user.email;
+
+    adminStatus.className =
+      "status success";
+
+    loadAdminVideos();
+
+  }else{
+
+    panel.classList.add("hidden");
+
+  }
+
+});
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+window.logoutAdmin = async function(){
+
+  try{
+
+    await signOut(auth);
+
+    alert("Admin logout हो गया।");
+
+  }catch(error){
+
+    alert(error.message);
+
+  }
+
+};
+
+
+/* =====================================================
+   ADD VIDEO
+===================================================== */
+
+window.addVideo = async function(){
+
+  console.log("ADD VIDEO clicked");
+
+
+  if(!auth.currentUser){
+
+    alert("पहले Admin Login करें।");
+
+    return;
+  }
+
+
+  const title =
+    document.getElementById("title").value.trim();
+
+  const category =
+    document.getElementById("category").value;
+
+  const thumbnail =
+    document.getElementById("thumbnail").value.trim();
+
+  const videoUrl =
+    document.getElementById("videoUrl").value.trim();
+
+
+  if(!title){
+
+    alert("Video Title डालें।");
+
+    return;
+  }
+
+
+  if(!videoUrl){
+
+    alert("Video URL डालें।");
+
+    return;
+  }
+
+
+  const btn =
+    document.getElementById("addBtn");
+
+  btn.disabled=true;
+
+  btn.innerText="⏳ Saving...";
+
+
+  try{
+
+    await addDoc(
+      collection(db,"videos"),
+      {
+        title:title,
+        category:category,
+        thumbnail:thumbnail,
+        videoUrl:videoUrl,
+        createdAt:serverTimestamp(),
+        createdBy:auth.currentUser.email
+      }
+    );
+
+
+    alert("✅ Video successfully added!");
+
+    document.getElementById("title").value="";
+    document.getElementById("thumbnail").value="";
+    document.getElementById("videoUrl").value="";
+
+    await loadVideos();
+    await loadAdminVideos();
+
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "❌ Video save नहीं हुआ:\n" +
+      error.message
+    );
+
+  }finally{
+
+    btn.disabled=false;
+
+    btn.innerText="➕ ADD VIDEO";
+
+  }
+
+};
+
+
+/* =====================================================
+   YOUTUBE URL
+===================================================== */
+
+function youtubeId(url){
+
+  try{
+
+    const u=new URL(url);
+
+    if(u.hostname.includes("youtu.be")){
+
+      return u.pathname.substring(1);
+
+    }
+
+    if(u.hostname.includes("youtube.com")){
+
+      return u.searchParams.get("v");
+
+    }
+
+  }catch(e){}
+
+  return null;
+
+}
+
+
+/* =====================================================
+   VIDEO PLAYER
+===================================================== */
+
+function videoPlayer(url){
+
+  const id=youtubeId(url);
+
+  if(id){
+
+    return `
+      <iframe
+        src="https://www.youtube.com/embed/${id}"
+        allowfullscreen>
+      </iframe>
+    `;
+
+  }
+
+
+  if(
+    url.endsWith(".mp4") ||
+    url.includes(".mp4?")
+  ){
+
+    return `
+      <video controls
+        src="${escapeHtml(url)}">
+      </video>
+    `;
+
+  }
+
+
+  return `
+    <div style="padding:20px">
+      <a href="${escapeHtml(url)}"
+         target="_blank"
+         style="color:#ff4444">
+         ▶ Open Video
+      </a>
+    </div>
+  `;
+
+}
+
+
+/* =====================================================
+   LOAD VIDEOS
+===================================================== */
+
+async function loadVideos(){
+
+  const box =
+    document.getElementById("videos");
+
+  try{
+
+    const q=query(
+      collection(db,"videos"),
+      orderBy("createdAt","desc")
+    );
+
+    const snapshot=await getDocs(q);
+
+    if(snapshot.empty){
+
+      box.innerHTML =
+        "<p>अभी कोई video नहीं है।</p>";
+
+      return;
+    }
+
+
+    box.innerHTML="";
+
+
+    snapshot.forEach(item=>{
+
+      const v=item.data();
+
+      const div=document.createElement("div");
+
+      div.className="video";
+
+      div.innerHTML=`
+
+        ${videoPlayer(v.videoUrl)}
+
+        <div class="videoInfo">
+
+          <div class="videoTitle">
+            ${escapeHtml(v.title)}
+          </div>
+
+          <div class="small">
+            ${escapeHtml(v.category)}
+          </div>
+
+        </div>
+      `;
+
+      box.appendChild(div);
+
+    });
+
+
+  }catch(error){
+
+    console.error(error);
+
+    box.innerHTML =
+      "❌ Videos load नहीं हुए: " +
+      error.message;
+
+  }
+
+}
+
+
+/* =====================================================
+   LOAD ADMIN VIDEOS
+===================================================== */
+
+async function loadAdminVideos(){
+
+  const box =
+    document.getElementById("adminVideos");
+
+  try{
+
+    const snapshot =
+      await getDocs(collection(db,"videos"));
+
+    if(snapshot.empty){
+
+      box.innerHTML =
+        "<p>अभी कोई video नहीं है।</p>";
+
+      return;
+    }
+
+
+    box.innerHTML="";
+
+
+    snapshot.forEach(item=>{
+
+      const v=item.data();
+
+      const div=document.createElement("div");
+
+      div.style.cssText=
+        "background:#222;padding:15px;margin:10px 0;border-radius:10px";
+
+      div.innerHTML=`
+
+        <b>${escapeHtml(v.title)}</b>
+
+        <br>
+
+        <span style="color:#aaa">
+          ${escapeHtml(v.category)}
+        </span>
+
+        <br><br>
+
+        <button
+          style="background:#d00;color:#fff"
+          onclick="deleteVideo('${item.id}')">
+          🗑 Delete
+        </button>
+      `;
+
+      box.appendChild(div);
+
+    });
+
+
+  }catch(error){
+
+    box.innerHTML =
+      "❌ Admin videos load error: " +
+      error.message;
+
+  }
+
+}
+
+
+/* =====================================================
+   DELETE
+===================================================== */
+
+window.deleteVideo = async function(id){
+
+  if(!auth.currentUser){
+
+    alert("Admin login required.");
+
+    return;
+  }
+
+
+  if(!confirm("क्या यह video delete करना है?")){
+
+    return;
+  }
+
+
+  try{
+
+    await deleteDoc(
+      doc(db,"videos",id)
+    );
+
+    alert("✅ Video deleted");
+
+    loadVideos();
+    loadAdminVideos();
+
+  }catch(error){
+
+    alert(
+      "❌ Delete failed: " +
+      error.message
+    );
+
+  }
+
+};
+
+
+/* =====================================================
+   CATEGORY FILTER
+===================================================== */
+
+window.showCategory = async function(category,button){
+
+  document
+    .querySelectorAll(".tab")
+    .forEach(x=>x.classList.remove("active"));
+
+  button.classList.add("active");
+
+
+  const box =
+    document.getElementById("videos");
+
+
+  try{
+
+    const snapshot =
+      await getDocs(collection(db,"videos"));
+
+    box.innerHTML="";
+
+
+    let count=0;
+
+
+    snapshot.forEach(item=>{
+
+      const v=item.data();
+
+
+      if(
+        category!=="All" &&
+        v.category!==category
+      ){
+
+        return;
+      }
+
+
+      count++;
+
+
+      const div=document.createElement("div");
+
+      div.className="video";
+
+      div.innerHTML=`
+
+        ${videoPlayer(v.videoUrl)}
+
+        <div class="videoInfo">
+
+          <div class="videoTitle">
+            ${escapeHtml(v.title)}
+          </div>
+
+          <div class="small">
+            ${escapeHtml(v.category)}
+          </div>
+
+        </div>
+
+      `;
+
+      box.appendChild(div);
+
+    });
+
+
+    if(count===0){
+
+      box.innerHTML =
+        "<p>इस category में अभी कोई video नहीं है।</p>";
+
+    }
+
+
+  }catch(error){
+
+    box.innerHTML =
+      "❌ Category error: " +
+      error.message;
+
+  }
+
+};
+
+
+/* =====================================================
+   SECURITY HTML ESCAPE
+===================================================== */
+
+function escapeHtml(text){
+
+  if(!text) return "";
+
+  return text
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+</script>
+
+</body>
+</html>
