@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Arslan Ki YouTube</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#080808;
+color:#fff
+}
+header{
+position:sticky;
+top:0;
+z-index:20;
+display:flex;
+align-items:center;
+gap:12px;
+padding:14px;
+background:#111;
+border-bottom:1px solid #252525
+}
+.logo{
+font-size:21px;
+font-weight:bold;
+color:#ff3030;
+white-space:nowrap
+}
+.search{
+flex:1;
+padding:12px 16px;
+border-radius:25px;
+border:1px solid #333;
+background:#181818;
+color:#fff;
+outline:none
+}
+button{
+border:0;
+padding:11px 17px;
+border-radius:10px;
+font-weight:bold;
+cursor:pointer
+}
+.admin{
+background:#ff3030;
+color:#fff
+}
+nav{
+display:flex;
+gap:10px;
+padding:15px;
+overflow-x:auto;
+background:#0b0b0b
+}
+.nav{
+background:#171717;
+color:#fff;
+min-width:90px
+}
+.nav.active{
+background:#fff;
+color:#000
+}
+.hero{
+margin:20px;
+padding:30px;
+border-radius:20px;
+background:linear-gradient(135deg,#1b1b1b,#101010)
+}
+.hero h1{
+font-size:38px;
+margin:0 0 12px
+}
+.hero p{
+color:#aaa
+}
+.container{
+padding:20px
+}
+.status{
+padding:12px;
+margin-bottom:20px;
+border-radius:10px;
+background:#151515;
+color:#aaa
+}
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+gap:18px
+}
+.card{
+background:#151515;
+border:1px solid #252525;
+border-radius:15px;
+overflow:hidden
+}
+.thumb{
+width:100%;
+height:155px;
+object-fit:cover;
+background:#222
+}
+.cardbody{
+padding:15px
+}
+.card h3{
+margin:0 0 8px
+}
+.category{
+font-size:13px;
+color:#aaa
+}
+.watch{
+width:100%;
+margin-top:12px;
+background:#ff3030;
+color:#fff
+}
+.empty{
+text-align:center;
+padding:60px 10px;
+color:#777
+}
+.modal{
+display:none;
+position:fixed;
+inset:0;
+z-index:100;
+background:rgba(0,0,0,.85);
+padding:20px;
+overflow:auto
+}
+.box{
+max-width:650px;
+margin:30px auto;
+background:#181818;
+border-radius:20px;
+padding:22px
+}
+.box h2{
+margin-top:0
+}
+input,select{
+width:100%;
+padding:13px;
+margin:7px 0 14px;
+border-radius:9px;
+border:1px solid #333;
+background:#0c0c0c;
+color:#fff;
+outline:none
+}
+.add{
+width:100%;
+background:#ff3030;
+color:#fff
+}
+.close{
+width:100%;
+margin-top:10px;
+background:#444;
+color:#fff
+}
+.item{
+background:#101010;
+border:1px solid #292929;
+padding:12px;
+border-radius:10px;
+margin-top:10px
+}
+.delete{
+background:#a00020;
+color:#fff;
+margin-top:9px
+}
+iframe{
+width:100%;
+height:400px;
+border:0;
+border-radius:12px
+}
+video{
+width:100%;
+max-height:500px;
+border-radius:12px
+}
+.small{
+font-size:12px;
+color:#888
+}
+@media(max-width:650px){
+header{
+flex-wrap:wrap
+}
+.logo{
+width:100%
+}
+.search{
+order:3;
+width:100%
+}
+.hero h1{
+font-size:29px
+}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">▶ Arslan Ki YouTube</div>
+
+<input
+id="search"
+class="search"
+placeholder="Search videos..."
+>
+
+<button class="admin" onclick="openAdmin()">
+Admin
+</button>
+
+</header>
+
+
+<nav>
+
+<button class="nav active" onclick="category('All',this)">
+Home
+</button>
+
+<button class="nav" onclick="category('Series',this)">
+Series
+</button>
+
+<button class="nav" onclick="category('Movies',this)">
+Movies
+</button>
+
+<button class="nav" onclick="category('Shorts',this)">
+Shorts
+</button>
+
+</nav>
+
+
+<section class="hero">
+
+<h1>Welcome to Arslan Ki YouTube</h1>
+
+<p>
+Public videos, series, movies and shorts.
+</p>
+
+</section>
+
+
+<div class="container">
+
+<div id="status" class="status">
+⏳ Firebase connecting...
+</div>
+
+<div id="videos" class="grid"></div>
+
+</div>
+
+
+<!-- ADMIN -->
+
+<div id="adminModal" class="modal">
+
+<div class="box">
+
+<h2>👑 Admin Panel</h2>
+
+<p id="adminStatus">
+Connecting...
+</p>
+
+<hr>
+
+<h3>➕ Add New Video</h3>
+
+<label>Video Title</label>
+
+<input
+id="title"
+placeholder="Example: My New Video"
+>
+
+
+<label>Category</label>
+
+<select id="cat">
+
+<option value="Series">Series</option>
+<option value="Movies">Movies</option>
+<option value="Shorts">Shorts</option>
+<option value="All">All</option>
+
+</select>
+
+
+<label>Thumbnail URL</label>
+
+<input
+id="thumb"
+placeholder="https://example.com/image.jpg"
+>
+
+
+<label>Video URL</label>
+
+<input
+id="url"
+placeholder="YouTube link या MP4 link"
+>
+
+
+<button class="add" onclick="addVideo()">
+➕ ADD VIDEO
+</button>
+
+
+<button class="close" onclick="closeAdmin()">
+CLOSE
+</button>
+
+
+<h3>📺 Added Videos</h3>
+
+<div id="adminVideos"></div>
+
+</div>
+
+</div>
+
+
+<!-- VIDEO PLAYER -->
+
+<div id="watchModal" class="modal">
+
+<div class="box">
+
+<h2 id="watchTitle">
+Video
+</h2>
+
+<div id="player"></div>
+
+<button class="close" onclick="closeWatch()">
+CLOSE
+</button>
+
+</div>
+
+</div>
+
+
+<script type="module">
+
+/* =========================================
+   YOUR FIREBASE CONFIG
+   ========================================= */
+
+const firebaseConfig = {
+
+apiKey:
+"AIzaSyCNfGSL9JmvrcydSniyIdz7ULiIsNYbbTo",
+
+authDomain:
+"kranti-1e28f.firebaseapp.com",
+
+projectId:
+"kranti-1e28f",
+
+storageBucket:
+"kranti-1e28f.firebasestorage.app",
+
+messagingSenderId:
+"407524375045",
+
+appId:
+"1:407524375045:web:d74b6335be39bc935d7a6c",
+
+measurementId:
+"G-HP3QFTLLBT"
+
+};
+
+
+/* =========================================
+   FIREBASE
+   ========================================= */
+
+import {
+initializeApp
+}
+from
+"https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+
+
+import {
+getAuth,
+signInAnonymously,
+onAuthStateChanged
+}
+from
+"https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+
+import {
+getFirestore,
+collection,
+addDoc,
+getDocs,
+deleteDoc,
+doc,
+serverTimestamp
+}
+from
+"https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+
+const app =
+initializeApp(firebaseConfig);
+
+
+const auth =
+getAuth(app);
+
+
+const db =
+getFirestore(app);
+
+
+let firebaseOK=false;
+
+let currentUser=null;
+
+let allVideos=[];
+
+let currentCategory="All";
+
+
+/* =========================================
+   CONNECT
+   ========================================= */
+
+signInAnonymously(auth)
+
+.then(() => {
+
+firebaseOK=true;
+
+document.getElementById("status").innerText=
+"✅ Firebase Connected";
+
+document.getElementById("adminStatus").innerText=
+"✅ Firebase Connected";
+
+loadVideos();
+
+})
+
+.catch(error => {
+
+console.error(error);
+
+document.getElementById("status").innerText=
+"❌ Firebase Error: "+error.message;
+
+document.getElementById("adminStatus").innerText=
+"❌ Firebase connection failed";
+
+});
+
+
+onAuthStateChanged(auth,user=>{
+
+if(user){
+
+currentUser=user;
+
+console.log(
+"Firebase anonymous user:",
+user.uid
+);
+
+}
+
+});
+
+
+/* =========================================
+   LOAD
+   ========================================= */
+
+async function loadVideos(){
+
+try{
+
+const snap=
+await getDocs(
+collection(db,"videos")
+);
+
+allVideos=[];
+
+snap.forEach(item=>{
+
+allVideos.push({
+
+id:item.id,
+...item.data()
+
+});
+
+});
+
+renderVideos();
+
+renderAdmin();
+
+}
+catch(error){
+
+console.error(error);
+
+document.getElementById("status").innerText=
+"❌ Videos load नहीं हुए: "+error.message;
+
+}
+
+}
+
+
+/* =========================================
+   ADD VIDEO
+   ========================================= */
+
+window.addVideo=async function(){
+
+if(!firebaseOK){
+
+alert(
+"Firebase अभी connected नहीं है।"
+);
+
+return;
+
+}
+
+
+const title=
+document.getElementById("title")
+.value.trim();
+
+
+const cat=
+document.getElementById("cat")
+.value;
+
+
+const thumb=
+document.getElementById("thumb")
+.value.trim();
+
+
+const url=
+document.getElementById("url")
+.value.trim();
+
+
+if(!title){
+
+alert("Video title डालो।");
+return;
+
+}
+
+
+if(!url){
+
+alert("Video URL डालो।");
+return;
+
+}
+
+
+try{
+
+await addDoc(
+collection(db,"videos"),
+{
+
+title:title,
+
+category:cat,
+
+thumbnail:thumb,
+
+videoUrl:url,
+
+createdAt:
+serverTimestamp(),
+
+addedBy:
+currentUser ? currentUser.uid : ""
+
+}
+);
+
+
+alert(
+"✅ Video Firebase में save हो गया!"
+);
+
+
+document.getElementById("title").value="";
+document.getElementById("thumb").value="";
+document.getElementById("url").value="";
+
+
+await loadVideos();
+
+
+}
+catch(error){
+
+console.error(error);
+
+alert(
+"❌ Save Error:\n"+error.message
+);
+
+}
+
+};
+
+
+/* =========================================
+   DISPLAY
+   ========================================= */
+
+function renderVideos(){
+
+const box=
+document.getElementById("videos");
+
+
+const search=
+document.getElementById("search")
+.value
+.toLowerCase();
+
+
+const filtered=
+allVideos.filter(video=>{
+
+const catOK=
+currentCategory==="All" ||
+video.category===currentCategory;
+
+
+const searchOK=
+!search ||
+(video.title||"")
+.toLowerCase()
+.includes(search);
+
+
+return catOK && searchOK;
+
+});
+
+
+if(filtered.length===0){
+
+box.innerHTML=
+`
+<div class="empty">
+अभी कोई video नहीं मिला।
+</div>
+`;
+
+return;
+
+}
+
+
+box.innerHTML=
+filtered.map(video=>{
+
+const image=
+video.thumbnail ||
+"https://via.placeholder.com/600x350?text=Video";
+
+
+return `
+
+<div class="card">
+
+<img
+class="thumb"
+src="${safe(image)}"
+onerror="
+this.src='https://via.placeholder.com/600x350?text=Video'
+"
+>
+
+<div class="cardbody">
+
+<h3>
+${safe(video.title||"Untitled")}
+</h3>
+
+<div class="category">
+${safe(video.category||"Video")}
+</div>
+
+<button
+class="watch"
+onclick="watch('${video.id}')"
+>
+▶ Watch
+</button>
+
+</div>
+
+</div>
+
+`;
+
+}).join("");
+
+}
+
+
+/* =========================================
+   SEARCH
+   ========================================= */
+
+document
+.getElementById("search")
+.addEventListener(
+"input",
+renderVideos
+);
+
+
+/* =========================================
+   CATEGORY
+   ========================================= */
+
+window.category=function(cat,button){
+
+currentCategory=cat;
+
+
+document
+.querySelectorAll(".nav")
+.forEach(x=>
+x.classList.remove("active")
+);
+
+
+button.classList.add("active");
+
+
+renderVideos();
+
+};
+
+
+/* =========================================
+   ADMIN
+   ========================================= */
+
+window.openAdmin=function(){
+
+document.getElementById("adminModal")
+.style.display="block";
+
+renderAdmin();
+
+};
+
+
+window.closeAdmin=function(){
+
+document.getElementById("adminModal")
+.style.display="none";
+
+};
+
+
+/* =========================================
+   ADMIN VIDEO LIST
+   ========================================= */
+
+function renderAdmin(){
+
+const box=
+document.getElementById("adminVideos");
+
+
+if(allVideos.length===0){
+
+box.innerHTML=
+"<p class='small'>अभी कोई video नहीं है।</p>";
+
+return;
+
+}
+
+
+box.innerHTML=
+allVideos.map(video=>{
+
+return `
+
+<div class="item">
+
+<b>
+${safe(video.title||"Untitled")}
+</b>
+
+<br>
+
+<span class="small">
+${safe(video.category||"")}
+</span>
+
+<br>
+
+<button
+class="delete"
+onclick="removeVideo('${video.id}')"
+>
+🗑 Delete
+</button>
+
+</div>
+
+`;
+
+}).join("");
+
+}
+
+
+/* =========================================
+   DELETE
+   ========================================= */
+
+window.removeVideo=
+async function(id){
+
+if(
+!confirm(
+"क्या यह video delete करना है?"
+)
+){
+
+return;
+
+}
+
+
+try{
+
+await deleteDoc(
+doc(db,"videos",id)
+);
+
+
+alert(
+"✅ Video delete हो गया।"
+);
+
+
+await loadVideos();
+
+}
+catch(error){
+
+alert(
+"❌ Delete Error:\n"+error.message
+);
+
+}
+
+};
+
+
+/* =========================================
+   WATCH
+   ========================================= */
+
+window.watch=
+function(id){
+
+const video=
+allVideos.find(
+x=>x.id===id
+);
+
+
+if(!video)return;
+
+
+document.getElementById(
+"watchTitle"
+).innerText=
+video.title||"Video";
+
+
+const url=
+video.videoUrl;
+
+
+const player=
+document.getElementById("player");
+
+
+if(
+url.includes("youtube.com") ||
+url.includes("youtu.be")
+){
+
+const id=
+youtubeId(url);
+
+
+if(id){
+
+player.innerHTML=
+`
+<iframe
+src="https://www.youtube.com/embed/${id}"
+allowfullscreen>
+</iframe>
+`;
+
+}else{
+
+player.innerHTML=
+"<p>Invalid YouTube URL</p>";
+
+}
+
+}
+else{
+
+player.innerHTML=
+`
+<video controls playsinline>
+
+<source
+src="${safe(url)}"
+>
+
+आपका browser video play नहीं कर सकता।
+
+</video>
+`;
+
+}
+
+
+document.getElementById(
+"watchModal"
+).style.display="block";
+
+};
+
+
+window.closeWatch=function(){
+
+document.getElementById(
+"watchModal"
+).style.display="none";
+
+
+document.getElementById(
+"player"
+).innerHTML="";
+
+};
+
+
+/* =========================================
+   YOUTUBE ID
+   ========================================= */
+
+function youtubeId(url){
+
+try{
+
+const u=
+new URL(url);
+
+
+if(
+u.hostname.includes("youtu.be")
+){
+
+return u.pathname.substring(1);
+
+}
+
+
+return u.searchParams.get("v");
+
+}
+catch{
+
+return null;
+
+}
+
+}
+
+
+/* =========================================
+   SAFE HTML
+   ========================================= */
+
+function safe(value){
+
+return String(value)
+
+.replaceAll("&","&amp;")
+
+.replaceAll("<","&lt;")
+
+.replaceAll(">","&gt;")
+
+.replaceAll('"',"&quot;")
+
+.replaceAll("'","&#039;");
+
+}
+
+</script>
+
+</body>
+</html>
